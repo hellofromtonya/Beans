@@ -5,7 +5,7 @@
  * @package Initialize
  */
 
-add_action( 'beans_init', 'beans_define_constants', -1 );
+add_action( 'beans_init', 'beans_define_constants', - 1 );
 /**
  * Define constants.
  *
@@ -52,7 +52,7 @@ function beans_define_constants() {
 
 }
 
-add_action( 'beans_init', 'beans_load_dependencies', -1 );
+add_action( 'beans_init', 'beans_load_dependencies', - 1 );
 /**
  * Load dependencies.
  *
@@ -98,23 +98,39 @@ add_action( 'beans_init', 'beans_add_theme_support' );
  */
 function beans_add_theme_support() {
 
-	add_theme_support( 'title-tag' );
-	add_theme_support( 'custom-background' );
-	add_theme_support( 'menus' );
-	add_theme_support( 'post-thumbnails' );
-	add_theme_support( 'automatic-feed-links' );
-	add_theme_support( 'html5', array( 'comment-list', 'comment-form', 'search-form', 'gallery', 'caption' ) );
-	add_theme_support( 'custom-header', array(
-		'width'       => 2000,
-		'height'      => 500,
-		'flex-height' => true,
-		'flex-width'  => true,
-		'header-text' => false,
+	/**
+	 * Filterable add_theme_supports, allowing a child theme or plugin to configure
+	 * what features should be registered.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param array Array of theme supports
+	 *              key: is the feature name
+	 *              value: is the value for this feature. If none, set to `null`
+	 */
+	$theme_supports = apply_filters( 'beans_add_theme_supports', array(
+		'title-tag'             => null,
+		'custom-background'     => null,
+		'menus'                 => null,
+		'post-thumbnails'       => null,
+		'automatic-feed-links'  => null,
+		'html5'                 => array( 'comment-list', 'comment-form', 'search-form', 'gallery', 'caption' ),
+		'custom-header'         => array(
+			'width'       => 2000,
+			'height'      => 500,
+			'flex-height' => true,
+			'flex-width'  => true,
+			'header-text' => false,
+		),
+
+		// Beans specific.
+		'offcanvas-menu'        => null,
+		'beans-default-styling' => null,
 	) );
 
-	// Beans specific.
-	add_theme_support( 'offcanvas-menu' );
-	add_theme_support( 'beans-default-styling' );
+	foreach ( $theme_supports as $feature => $value ) {
+		add_theme_support( $feature, $value );
+	}
 
 }
 
@@ -170,12 +186,12 @@ function beans_load_textdomain() {
  */
 do_action( 'beans_before_init' );
 
-	/**
-	 * Load Beans framework.
-	 *
-	 * @since 1.0.0
-	 */
-	do_action( 'beans_init' );
+/**
+ * Load Beans framework.
+ *
+ * @since 1.0.0
+ */
+do_action( 'beans_init' );
 
 /**
  * Fires after Beans loads.
