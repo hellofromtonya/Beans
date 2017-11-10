@@ -1,0 +1,7 @@
+vendor
+reports
+logs
+node_modules
+
+# Configs have sensitive information.
+tests/config/

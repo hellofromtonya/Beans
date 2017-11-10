@@ -99,8 +99,11 @@ add_action( 'beans_init', 'beans_add_theme_support' );
 function beans_add_theme_support() {
 
 	/**
-	 * Filterable add_theme_supports, allowing a child theme or plugin to configure
-	 * what features should be registered.
+	 * Configurable filter for adding theme supports.
+	 *
+	 * An array of theme support features is passed to each of the registered callbacks,
+	 * allowing each to extend or modify the features to be added via
+	 * `add_theme_support`.
 	 *
 	 * @since 1.5.0
 	 *

@@ -14,8 +14,8 @@ beans_add_smart_action( 'beans_head', 'beans_head_meta', 0 );
 function beans_head_meta() {
 
 	?>
-	<meta charset="<?php esc_attr_e( get_bloginfo( 'charset' ) ); ?>" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="<?php esc_attr_e( get_bloginfo( 'charset' ) ); ?>"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<?php
 
 }
@@ -28,7 +28,8 @@ beans_add_smart_action( 'wp_head', 'beans_head_pingback' );
  */
 function beans_head_pingback() {
 
-	?><link rel="pingback" href="<?php echo esc_url( get_bloginfo( 'pingback_url' ) ); ?>"><?php
+	?>
+    <link rel="pingback" href="<?php echo esc_url( get_bloginfo( 'pingback_url' ) ); ?>"><?php
 
 }
 
@@ -67,14 +68,15 @@ function beans_header_image() {
 		return;
 	}
 
-	?><style type="text/css">
-		.tm-header {
-			background-image: url(<?php echo esc_url( $header_image ); ?>);
-			background-position: 50% 50%;
-			background-size: cover;
-			background-repeat: no-repeat;
-		}
-	</style><?php
+	?>
+    <style type="text/css">
+    .tm-header {
+        background-image: url(<?php echo esc_url( $header_image ); ?>);
+        background-position: 50% 50%;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    </style><?php
 
 }
 
@@ -90,23 +92,23 @@ function beans_site_branding() {
 		'class' => 'tm-site-branding uk-float-left' . ( ! get_bloginfo( 'description' ) ? ' uk-margin-small-top' : null ),
 	) );
 
-		beans_open_markup_e( 'beans_site_title_link', 'a', array(
-			'href'     => home_url(), // Automatically escaped.
-			'rel'      => 'home',
-			'itemprop' => 'headline',
+	beans_open_markup_e( 'beans_site_title_link', 'a', array(
+		'href'     => home_url(), // Automatically escaped.
+		'rel'      => 'home',
+		'itemprop' => 'headline',
+	) );
+
+	if ( $logo = get_theme_mod( 'beans_logo_image', false ) ) {
+		beans_selfclose_markup_e( 'beans_logo_image', 'img', array(
+			'class' => 'tm-logo',
+			'src'   => $logo, // Automatically escaped.
+			'alt'   => get_bloginfo( 'name' ), // Automatically escaped.
 		) );
+	} else {
+		beans_output_e( 'beans_site_title_text', get_bloginfo( 'name' ) );
+	}
 
-			if ( $logo = get_theme_mod( 'beans_logo_image', false ) ) {
-				beans_selfclose_markup_e( 'beans_logo_image', 'img', array(
-					'class' => 'tm-logo',
-					'src'   => $logo, // Automatically escaped.
-					'alt'   => get_bloginfo( 'name' ), // Automatically escaped.
-				) );
-			} else {
-				beans_output_e( 'beans_site_title_text', get_bloginfo( 'name' ) );
-			}
-
-		beans_close_markup_e( 'beans_site_title_link', 'a' );
+	beans_close_markup_e( 'beans_site_title_link', 'a' );
 
 	beans_close_markup_e( 'beans_site_branding', 'div' );
 
@@ -130,8 +132,50 @@ function beans_site_title_tag() {
 		'itemprop' => 'description',
 	) );
 
-		beans_output_e( 'beans_site_title_tag_text', $description );
+	beans_output_e( 'beans_site_title_tag_text', $description );
 
 	beans_close_markup_e( 'beans_site_title_tag', 'span' );
+
+}
+
+add_action( 'get_header', 'beans_cleanup_head' );
+/**
+ * Cleans up the unnecessary code that WordPress loads into the `<head>`.
+ *
+ * @since 1.5.0
+ */
+function beans_cleanup_head() {
+
+	$config = [
+		[ 'wp_generator' ],
+		[ 'adjacent_posts_rel_link_wp_head', 10, 0 ],
+		[ 'wlwmanifest_link' ],
+		[ 'wp_shortlink_wp_head', 10, 0 ],
+	];
+
+	if ( ( is_single() && ! get_option( 'beans_comments_enabled_for_posts', false ) ) ||
+	     ( is_page() && ! get_option( 'beans_comments_enabled_for_pages', false ) ) ) {
+		$config = [ 'feed_links_extra', 3 ];
+	}
+
+	/**
+	 * Configurable filter for cleaning up the <head>, i.e. removing unnecessary
+	 * hooked features.
+	 *
+	 * To disable, return an empty array or register `__return_false` to the filter.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param array Array of callbacks to unregister from the `wp_head` event.
+	 */
+	$config = (array) apply_filters( 'beans_head_cleanup', $config );
+	foreach ( $config as $cleanupItem ) {
+		remove_action(
+			'wp_head',
+			$cleanupItem[0],
+			isset( $cleanupItem[1] ) ? $cleanupItem[1] : 10,
+			isset( $cleanupItem[2] ) ? $cleanupItem[2] : 1
+		);
+	}
 
 }
