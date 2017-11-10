@@ -94,6 +94,8 @@ add_action( 'beans_init', 'beans_add_theme_support' );
 /**
  * Add theme support.
  *
+ * @since 1.5.0
+ *
  * @ignore
  */
 function beans_add_theme_support() {
@@ -132,6 +134,11 @@ function beans_add_theme_support() {
 	) );
 
 	foreach ( $theme_supports as $feature => $value ) {
+		if ( null === $value ) {
+			add_theme_support( $feature );
+			continue;
+		}
+
 		add_theme_support( $feature, $value );
 	}
 
@@ -144,6 +151,8 @@ add_action( 'beans_init', 'beans_includes' );
  * @ignore
  */
 function beans_includes() {
+
+	require_once dirname(__FILE__) . '/setup/head-cleanup.php';
 
 	// Include admin.
 	if ( is_admin() ) {
