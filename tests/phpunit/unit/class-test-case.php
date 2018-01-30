@@ -21,13 +21,25 @@ use PHPUnit\Framework\TestCase;
 abstract class Test_Case extends TestCase {
 
 	/**
+	 * When true, return the given path when doing wp_normalize_path().
+	 *
+	 * @var bool
+	 */
+	protected $just_return_path = false;
+
+	/**
 	 * Prepares the test environment before each test.
 	 */
 	protected function setUp() {
 		parent::setUp();
 		Monkey\setUp();
 
-		Functions\when( 'wp_normalize_path' )->alias( function ( $path ) {
+		Functions\when( 'wp_normalize_path' )->alias( function( $path ) {
+
+			if ( true === $this->just_return_path ) {
+				return $path;
+			}
+
 			$path = str_replace( '\\', '/', $path );
 			$path = preg_replace( '|(?<=.)/+|', '/', $path );
 
@@ -38,7 +50,7 @@ abstract class Test_Case extends TestCase {
 			return $path;
 		} );
 
-		Functions\when( 'wp_json_encode' )->alias( function ( $array ) {
+		Functions\when( 'wp_json_encode' )->alias( function( $array ) {
 			// @codingStandardsIgnoreLine - WordPress.WP.AlternativeFunctions.json_encode_json_encode - we are mocking the function here.
 			return json_encode( $array );
 		} );
